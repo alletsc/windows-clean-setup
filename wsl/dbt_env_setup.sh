@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
+
+# LOG opcional: descomente as linhas abaixo para salvar tudo em ~/pyenv_dbt_setup_log.txt
+# LOG="$HOME/pyenv_dbt_setup_log.txt"
+# exec > >(tee -a "$LOG") 2>&1
 
 # Checagem básica para não rodar fora do WSL/Ubuntu
 if ! grep -qi microsoft /proc/version && [ "$(uname -s)" != "Linux" ]; then
@@ -21,12 +25,21 @@ echo "📂 Instalando pyenv (gerenciador de versões do Python)..."
 if [ ! -d "$HOME/.pyenv" ]; then
   curl https://pyenv.run | bash
 else
-  echo "pyenv já está instalado."
+  echo "✅ pyenv já está instalado."
 fi
 
-# Configuração do pyenv no shell (zsh ou bash)
+# Configuração do pyenv no shell (zsh ou bash, inteligente)
 SHELL_RC="$HOME/.zshrc"
-[ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ] || SHELL_RC="$HOME/.bashrc"
+if [ -n "${ZSH_VERSION:-}" ]; then
+  SHELL_RC="$HOME/.zshrc"
+elif [ -n "${BASH_VERSION:-}" ]; then
+  SHELL_RC="$HOME/.bashrc"
+elif [ -f "$HOME/.zshrc" ]; then
+  SHELL_RC="$HOME/.zshrc"
+else
+  SHELL_RC="$HOME/.bashrc"
+fi
+
 if ! grep -q 'pyenv config' "$SHELL_RC"; then
   echo -e '\n# pyenv config' >> "$SHELL_RC"
   echo 'export PYENV_ROOT="$HOME/.pyenv"' >> "$SHELL_RC"
@@ -58,6 +71,7 @@ if [ ! -d "$VENV_PATH" ]; then
 fi
 
 echo "✅ Ativando ambiente virtual..."
+# shellcheck source=/dev/null
 source "$VENV_PATH/bin/activate"
 
 echo "📦 Instalando DBT + adaptador BigQuery..."
@@ -71,7 +85,7 @@ if [ ! -d "exemplo-projeto" ]; then
   echo "📁 Criando estrutura básica de projeto DBT..."
   dbt init exemplo-projeto
 else
-  echo "Projeto DBT 'exemplo-projeto' já existe."
+  echo "ℹ️ Projeto DBT 'exemplo-projeto' já existe."
 fi
 
 echo
