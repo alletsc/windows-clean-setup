@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Logging para arquivo (tudo será salvo em ~/wsl_setup_log.txt)
+LOG="$HOME/wsl_setup_log.txt"
+exec > >(tee -a "$LOG") 2>&1
+
+echo "===================================="
+echo "        WSL2 DEV SETUP LOG"
+echo "         $(date)"
+echo "===================================="
+
 # Garante execução apenas em WSL
 if ! grep -qi microsoft /proc/version; then
   echo "❌ Este script foi feito para WSL2! Abortando."
@@ -21,6 +30,12 @@ add_line() {
 echo "🔧 Atualizando sistema..."
 sudo apt update -y && sudo apt upgrade -y
 
+echo "🌎 Garantindo suporte a UTF-8 e timezone correto..."
+sudo apt install -y locales
+sudo locale-gen en_US.UTF-8 pt_BR.UTF-8
+sudo update-locale LANG=pt_BR.UTF-8
+sudo timedatectl set-timezone America/Sao_Paulo
+
 echo "🐚 Instalando Zsh, Git, fontes e utilitários básicos..."
 sudo apt install -y zsh git curl unzip fontconfig
 
@@ -33,7 +48,8 @@ sudo apt install -y build-essential pkg-config libssl-dev \
 
 echo "✨ Instalando Oh My Zsh..."
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  export RUNZSH=no
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
 echo "🚀 Instalando Starship..."
@@ -89,6 +105,9 @@ add_line ""
 add_line "# Alias para abrir Cursor"
 add_line "alias code=\"/mnt/c/Users/$WINUSER/AppData/Local/Programs/cursor/Cursor.exe\""
 
+echo "📦 Instalando utilitários CLI úteis: jq, yq, tree, fzf, bat, ripgrep, neovim, htop, tmux..."
+sudo apt install -y jq yq tree fzf bat ripgrep neovim htop tmux
+
 echo "🧽 Instalando Navi (cheatsheet + sugestões inteligentes)..."
 if ! command -v navi >/dev/null 2>&1; then
   curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install | bash
@@ -126,9 +145,6 @@ __pycache__/
 .DS_Store
 EOF
 
-echo "📦 Instalando utilitários CLI úteis: jq, yq, tree, fzf..."
-sudo apt install -y jq yq tree fzf
-
 # Sincronização de relógio e timezone
 echo "🕒 Sincronizando relógio e ajustando timezone..."
 sudo hwclock -s || true
@@ -146,4 +162,5 @@ EOF
 echo "✅ Arquivo .wslconfig criado com sucesso em C:\\Users\\$WINUSER\\.wslconfig"
 echo "🔁 Execute 'wsl --shutdown' no PowerShell para aplicar as novas configurações."
 
-echo "✅ Setup completo! Rode 'source ~/.zshrc' ou reinicie o terminal para aplicar tudo."
+echo -e "\n\033[1;32m🌟 SETUP WSL FINALIZADO! Rode 'source ~/.zshrc' ou reinicie o terminal para aplicar tudo.\033[0m"
+echo "📜 Veja o log completo deste setup em: $LOG"
