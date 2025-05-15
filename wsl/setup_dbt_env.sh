@@ -97,7 +97,9 @@ else
   echo "ℹ️ Projeto DBT 'dbtenv' já existe."
 fi
 
-alias dbtenv='source ~/dbt-env/bin/activate'
+if ! grep -q "alias dbtenv=" "$HOME/.zshrc"; then
+  echo "alias dbtenv='source ~/dbt-env/bin/activate'" >> "$HOME/.zshrc"
+fi
 
 echo
 echo "✅ Instalação finalizada com sucesso!"
