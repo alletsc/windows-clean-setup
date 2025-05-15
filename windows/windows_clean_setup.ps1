@@ -1,7 +1,7 @@
 # Executar como admin
 If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Start-Process PowerShell "-ExecutionPolicy Bypass -File `"%~dp0windows_clean_setup.ps1`"" -Verb RunAs
-    exit
+  Start-Process PowerShell "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+  exit
 }
 
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
@@ -41,24 +41,19 @@ foreach ($app in $apps) {
   Get-AppxPackage -Name $app | Remove-AppxPackage -ErrorAction SilentlyContinue
 }
 
-# Instalar programas úteis se necessário (INCLUINDO GIT E POWERTOYS)
-$appsToInstall = @{
-  "Google.Chrome" = "chrome.exe"
-  "OBSProject.OBSStudio" = "obs64.exe"
-  "Google.GoogleDrive" = "googledrivesync.exe"
-  "Klocman.BulkCrapUninstaller" = "BCUninstaller.exe"
-  "valinet.explorerpatcher" = "ep_setup.exe"
-  "Git.Git" = "git.exe"
-  "Microsoft.PowerToys" = "PowerToys.exe"
-}
-foreach ($id in $appsToInstall.Keys) {
-  $exe = $appsToInstall[$id]
-  if (-not (Get-Command $exe -ErrorAction SilentlyContinue)) {
-    Write-Host "Instalando $id..."
-    winget install --id=$id -e --accept-source-agreements --accept-package-agreements
-  } else {
-    Write-Host "$id já está instalado. Pulando..."
-  }
+# Instalar ou atualizar programas úteis via Winget (incluindo Git e PowerToys)
+$appsToInstall = @(
+  "Google.Chrome",
+  "OBSProject.OBSStudio",
+  "Google.GoogleDrive",
+  "Klocman.BulkCrapUninstaller",
+  "valinet.explorerpatcher",
+  "Git.Git",
+  "Microsoft.PowerToys"
+)
+foreach ($id in $appsToInstall) {
+  Write-Host "Instalando ou atualizando $id..."
+  winget install --id=$id -e --accept-source-agreements --accept-package-agreements --silent
 }
 
 # Desabilitar Spotlight e aplicar plano de fundo fixo
@@ -82,15 +77,15 @@ $fontsPath = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
 New-Item -ItemType Directory -Force -Path $fontsPath | Out-Null
 
 function Install-FontFromZip($url, $tempName) {
-    $zip = "$env:TEMP\$tempName.zip"
-    $out = "$env:TEMP\$tempName"
-    Invoke-WebRequest -Uri $url -OutFile $zip
-    Expand-Archive -Path $zip -DestinationPath $out -Force
-    Get-ChildItem -Path $out -Recurse -Include *.ttf | ForEach-Object {
-        Copy-Item $_.FullName -Destination $fontsPath
-    }
-    Remove-Item $zip -Force
-    Remove-Item $out -Recurse -Force
+  $zip = "$env:TEMP\$tempName.zip"
+  $out = "$env:TEMP\$tempName"
+  Invoke-WebRequest -Uri $url -OutFile $zip
+  Expand-Archive -Path $zip -DestinationPath $out -Force
+  Get-ChildItem -Path $out -Recurse -Include *.ttf | ForEach-Object {
+      Copy-Item $_.FullName -Destination $fontsPath
+  }
+  Remove-Item $zip -Force
+  Remove-Item $out -Recurse -Force
 }
 
 Install-FontFromZip -url "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/FiraCode.zip" -tempName "FiraCode"
@@ -109,12 +104,12 @@ Restart-Computer
 Write-Host "Definindo Google Chrome como navegador e leitor de PDF padrão..."
 $chromePath = "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe"
 if (!(Test-Path $chromePath)) {
-    $chromePath = "${env:ProgramFiles}\Google\Chrome\Application\chrome.exe"
+  $chromePath = "${env:ProgramFiles}\Google\Chrome\Application\chrome.exe"
 }
 if (Test-Path $chromePath) {
-    Start-Process -FilePath $chromePath -ArgumentList "--make-default-browser" -Wait
-    Start-Process "ms-settings:defaultapps"
-    Start-Process "ms-settings:defaultapps-app"
+  Start-Process -FilePath $chromePath -ArgumentList "--make-default-browser" -Wait
+  Start-Process "ms-settings:defaultapps"
+  Start-Process "ms-settings:defaultapps-app"
 }
 
 # Remover o atalho do Spotlight do desktop do usuário atual
@@ -124,6 +119,6 @@ Remove-Item "$env:USERPROFILE\Desktop\*Saiba mais sobre*" -Force -ErrorAction Si
 # Remove dos desktops dos outros usuários (admin)
 $users = Get-ChildItem "C:\Users" -Directory | Where-Object { Test-Path "$($_.FullName)\Desktop" }
 foreach ($user in $users) {
-    $file = Get-ChildItem "$($user.FullName)\Desktop" -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*Saiba mais sobre*" }
-    foreach ($f in $file) { Remove-Item $f.FullName -Force -ErrorAction SilentlyContinue }
+  $file = Get-ChildItem "$($user.FullName)\Desktop" -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*Saiba mais sobre*" }
+  foreach ($f in $file) { Remove-Item $f.FullName -Force -ErrorAction SilentlyContinue }
 }
