@@ -1,7 +1,6 @@
-
 # Executar como admin
 If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Start-Process PowerShell "-ExecutionPolicy Bypass -File `"%~dp0setup_windows_limpo.ps1`"" -Verb RunAs
+    Start-Process PowerShell "-ExecutionPolicy Bypass -File `"%~dp0windows_clean_setup.ps1`"" -Verb RunAs
     exit
 }
 
@@ -42,13 +41,15 @@ foreach ($app in $apps) {
   Get-AppxPackage -Name $app | Remove-AppxPackage -ErrorAction SilentlyContinue
 }
 
-# Instalar programas úteis se necessário
+# Instalar programas úteis se necessário (INCLUINDO GIT E POWERTOYS)
 $appsToInstall = @{
   "Google.Chrome" = "chrome.exe"
   "OBSProject.OBSStudio" = "obs64.exe"
   "Google.GoogleDrive" = "googledrivesync.exe"
   "Klocman.BulkCrapUninstaller" = "BCUninstaller.exe"
   "valinet.explorerpatcher" = "ep_setup.exe"
+  "Git.Git" = "git.exe"
+  "Microsoft.PowerToys" = "PowerToys.exe"
 }
 foreach ($id in $appsToInstall.Keys) {
   $exe = $appsToInstall[$id]
@@ -103,7 +104,6 @@ Start-Process explorer
 Start-Sleep -Seconds 5
 Write-Host "Finalizado. Reiniciando o sistema..."
 Restart-Computer
-
 
 # Tornar o Chrome o navegador e leitor de PDF padrão
 Write-Host "Definindo Google Chrome como navegador e leitor de PDF padrão..."
