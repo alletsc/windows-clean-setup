@@ -70,6 +70,11 @@ if [ ! -d "$VENV_PATH" ]; then
   python -m venv "$VENV_PATH"
 fi
 
+# Adiciona alias dbtenv para ativar o virtualenv facilmente
+if ! grep -q "alias dbtenv=" "$ZSHRC"; then
+  echo "alias dbtenv='source ~/dbt-env/bin/activate'" >> "$ZSHRC"
+fi
+
 echo "✅ Ativando ambiente virtual..."
 # shellcheck source=/dev/null
 source "$VENV_PATH/bin/activate"
