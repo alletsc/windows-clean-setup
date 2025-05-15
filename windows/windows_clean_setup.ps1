@@ -10,15 +10,15 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 $logPath = "$PSScriptRoot\setup_log.txt"
 
 function Write-Log {
-    param (
-        [Parameter(Mandatory)]
-        [string]$Message,
-        [string]$Color = "White"
-    )
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $entry = "[$timestamp] $Message"
-    Add-Content -Path $logPath -Value $entry
-    Write-Host $Message -ForegroundColor $Color
+  param (
+      [Parameter(Mandatory)]
+      [string]$Message,
+      [string]$Color = "White"
+  )
+  $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  $entry = "[$timestamp] $Message"
+  Add-Content -Path $logPath -Value $entry -Encoding UTF8
+  Write-Host $Message -ForegroundColor $Color
 }
 
 Write-Log "Iniciando configurações de limpeza e otimização do Windows..." "Cyan"
