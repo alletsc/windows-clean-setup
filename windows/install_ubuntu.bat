@@ -6,5 +6,5 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-powershell -ExecutionPolicy Bypass -NoExit -File "%~dp0install_wsl_ubuntu.ps1"
+powershell -ExecutionPolicy Bypass -NoExit -File "%~dp0install_ubuntu.ps1"
 pause
