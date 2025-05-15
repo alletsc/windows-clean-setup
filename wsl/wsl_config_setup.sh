@@ -121,7 +121,19 @@ if ! command -v zoxide >/dev/null 2>&1; then
   curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash -s -- --yes
 fi
 
-add_line 'eval "$(zoxide init zsh)"'
+# Garante PATH do zoxide ANTES do eval no .zshrc
+if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$ZSHRC"; then
+  sed -i '/export PATH="\$HOME\/.local\/bin:\$PATH"/d' "$ZSHRC"
+  if grep -q 'eval "$(zoxide init zsh)"' "$ZSHRC"; then
+    sed -i '/eval "\$(zoxide init zsh)"/i export PATH="$HOME/.local/bin:$PATH"' "$ZSHRC"
+  else
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$ZSHRC"
+  fi
+fi
+
+if ! grep -q 'eval "$(zoxide init zsh)"' "$ZSHRC"; then
+  echo 'eval "$(zoxide init zsh)"' >> "$ZSHRC"
+fi
 
 add_line ""
 add_line "# Aliases de navegação rápida com zoxide"

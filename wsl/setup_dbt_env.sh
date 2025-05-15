@@ -77,15 +77,18 @@ source "$VENV_PATH/bin/activate"
 echo "📦 Instalando DBT + adaptador BigQuery..."
 pip install --upgrade dbt-core dbt-bigquery
 
+# Instalação segura do Python e pip atualizado
+python -m pip install --upgrade pip
+
 # Estrutura universal de projetos DBT
 PROJ_ROOT="$HOME/projects/dbt"
 mkdir -p "$PROJ_ROOT"
 cd "$PROJ_ROOT"
-if [ ! -d "exemplo-projeto" ]; then
+if [ ! -d "dbtenv" ]; then
   echo "📁 Criando estrutura básica de projeto DBT..."
-  dbt init exemplo-projeto
+  dbt init dbtenv
 else
-  echo "ℹ️ Projeto DBT 'exemplo-projeto' já existe."
+  echo "ℹ️ Projeto DBT 'dbtenv' já existe."
 fi
 
 echo

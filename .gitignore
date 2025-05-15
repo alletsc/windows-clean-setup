@@ -12,6 +12,7 @@ venv/
 Thumbs.db
 
 # Ignore logs
+*.txt
 *.log
 setup_log.txt
 wsl_setup_log.txt
