@@ -52,6 +52,28 @@ winget install --id=Microsoft.WindowsTerminal -e --accept-source-agreements --ac
 Write-Log "Instalando Cursor (editor de texto)..." "Yellow"
 winget install --id=Anysphere.Cursor -e --accept-source-agreements --accept-package-agreements --silent | Tee-Object -FilePath $logPath -Append
 
+Write-Log "Instalando Oh My Posh (prompt nerd e customizável para o terminal)..." "Yellow"
+winget install JanDeDobbeleer.OhMyPosh -s winget --accept-source-agreements --accept-package-agreements --silent | Tee-Object -FilePath $logPath -Append
+
+# Baixa um tema bonito pronto (parar de perder tempo com tema feio)
+$ompThemeDir = "$env:USERPROFILE\oh-my-posh-themes"
+if (-not (Test-Path $ompThemeDir)) {
+    New-Item -Path $ompThemeDir -ItemType Directory | Out-Null
+}
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jandedobbeleer.omp.json" -OutFile "$ompThemeDir\jandedobbeleer.omp.json" -UseBasicParsing
+
+# Adiciona configuração automática ao profile do PowerShell
+$profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+if (-not (Test-Path $profilePath)) {
+    New-Item -ItemType File -Path $profilePath -Force | Out-Null
+}
+$content = @"
+oh-my-posh init pwsh --config `"$ompThemeDir\jandedobbeleer.omp.json`" | Invoke-Expression
+"@
+Add-Content -Path $profilePath -Value $content
+
+Write-Log "Oh My Posh instalado e configurado. Ao abrir o PowerShell, o prompt já estará customizado." "Cyan"
+
 
 # Outros apps importantes
 $appsToInstall = @(
