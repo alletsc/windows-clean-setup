@@ -6,5 +6,5 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-powershell -ExecutionPolicy Bypass -NoExit -File "%~dp0setup_windows_limpo.ps1"
+powershell -ExecutionPolicy Bypass -NoExit -File "%~dp0windows_clean_setup.ps1"
 pause
