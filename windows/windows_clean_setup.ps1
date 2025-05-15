@@ -7,6 +7,44 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 Write-Host "Aplicando configurações de limpeza e otimização do Windows..." -ForegroundColor Cyan
 
+# ---------- Tunagens DEV E OTIMIZAÇÃO ----------
+
+# 1. Desabilitar Telemetria e Cortana
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage -ErrorAction SilentlyContinue
+
+# 2. Desabilitar inicialização rápida (evita bugs dual boot/WSL)
+powercfg /h off
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v HiberbootEnabled /t REG_DWORD /d 0 /f
+
+# 3. Desabilitar serviços inúteis (exemplo: telemetria)
+Stop-Service -Name "DiagTrack" -Force
+Set-Service -Name "DiagTrack" -StartupType Disabled
+
+# 4. Limpar arquivos temporários
+del /q /s "$env:TEMP\*"
+del /q /s "C:\Windows\Temp\*"
+
+# 5. WSL 2 como padrão (instala Ubuntu separado, via outro script)
+wsl --set-default-version 2
+
+# 6. Instalar Terminal moderno
+winget install --id=Microsoft.WindowsTerminal -e --accept-source-agreements --accept-package-agreements --silent
+
+# 7. Política de energia - alto desempenho
+powercfg -setactive SCHEME_MIN
+
+# 8. Desabilitar atualização automática de drivers
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" /v SearchOrderConfig /t REG_DWORD /d 0 /f
+
+# 9. Limpar apps provisionados (para novos usuários)
+Get-AppxProvisionedPackage -Online | where DisplayName -like "*xbox*" | Remove-AppxProvisionedPackage -Online
+
+# 10. Atualizar Windows Defender
+Update-MpSignature
+
+# ---------- Seu script original começa aqui ----------
+
 # Ativar modo escuro
 $personalizePath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
 If (-Not (Test-Path $personalizePath)) { New-Item -Path $personalizePath -Force | Out-Null }
