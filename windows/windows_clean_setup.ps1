@@ -50,7 +50,8 @@ Write-Log "Instalando Windows Terminal..." "Yellow"
 winget install --id=Microsoft.WindowsTerminal -e --accept-source-agreements --accept-package-agreements --silent | Tee-Object -FilePath $logPath -Append
 
 Write-Log "Instalando Cursor (editor de texto)..." "Yellow"
-winget install --id=Cursor.Cursor -e --accept-source-agreements --accept-package-agreements --silent | Tee-Object -FilePath $logPath -Append
+winget install --id=Anysphere.Cursor -e --accept-source-agreements --accept-package-agreements --silent | Tee-Object -FilePath $logPath -Append
+
 
 # Outros apps importantes
 $appsToInstall = @(
