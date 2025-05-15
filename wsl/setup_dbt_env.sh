@@ -97,6 +97,8 @@ else
   echo "ℹ️ Projeto DBT 'dbtenv' já existe."
 fi
 
+alias dbtenv='source ~/dbt-env/bin/activate'
+
 echo
 echo "✅ Instalação finalizada com sucesso!"
 echo "ℹ️ Para ativar o ambiente depois, use:"
