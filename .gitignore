@@ -1,0 +1,41 @@
+# Ignore Python virtual environments
+dbt-env/
+venv/
+.venv/
+.env/
+
+# Ignore pyenv local versions
+.python-version
+
+# Ignore system/OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+setup_log.txt
+wsl_setup_log.txt
+wsl_install_log.txt
+pyenv_dbt_setup_log.txt
+
+# Ignore output from dbt
+dbt_packages/
+target/
+dbt_modules/
+
+# Ignore user/IDE/project settings
+.vscode/
+.idea/
+*.swp
+
+# Ignore backup files
+*~
+*.bak
+*.tmp
+
+# Ignore generated files
+*.pyc
+__pycache__/
+
+# Ignore personal configs
+*.local
